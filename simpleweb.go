@@ -31,6 +31,14 @@ func loadData() (string, error) {
 func postHandler(w http.ResponseWriter, r *http.Request) {
 	firstName := r.FormValue("first_name")
 	lastName := r.FormValue("last_name")
+	if firstName == "" {
+		http.Error(w, "first_name parameter missing", http.StatusBadRequest)
+		return
+	}
+	if lastName == "" {
+		http.Error(w, "last_name parameter missing", http.StatusBadRequest)
+		return
+	}	
 	u := &User{FirstName : firstName, LastName : lastName}
 	fmt.Println("Found user " + " firstName:" + firstName + " lastName:" + lastName)
 	err := saveUser(u)
