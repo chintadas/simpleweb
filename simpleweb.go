@@ -20,12 +20,12 @@ func saveUser(u *User) error {
 	return ioutil.WriteFile("user.txt", b, 0600)
 }
 
-func loadData() (string, error) {
+func loadData() ([]byte, error) {
 	data, err := ioutil.ReadFile("user.txt")
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return string(data), nil
+	return data, nil
 }
 
 func postHandler(w http.ResponseWriter, r *http.Request) {
@@ -43,7 +43,7 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Found user " + " firstName:" + firstName + " lastName:" + lastName)
 	err := saveUser(u)
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusFound)
+		http.Error(w, "Could not save data", http.StatusInternalServerError)
 		return
 	}
 }
@@ -51,9 +51,10 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 func dataHandler(w http.ResponseWriter, r *http.Request) {
 	data, err := loadData()
 	if err != nil {
-		fmt.Fprintf(w, "No data found")
+		http.Error(w, "No data found", http.StatusNotFound)
 	}
-	fmt.Fprintf(w, data)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(data)
 }
 
 func main() {
