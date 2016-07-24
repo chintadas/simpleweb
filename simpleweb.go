@@ -2,17 +2,22 @@ package main
 
 import (
 "fmt"
+"encoding/json"
 "io/ioutil"
 "net/http"
 )
 
 type User struct {
-	FirstName string
-	LastName string
+	FirstName string `json:"first_name"`
+	LastName string `json:"last_name"`
 }
 
 func saveUser(u *User) error {
-	return ioutil.WriteFile("user.txt", []byte("{ \"first_name\" : \""+ u.FirstName + "\", \"last_name\" : \"" + u.LastName + "\"}"), 0600)
+	b, err := json.Marshal(u)
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile("user.txt", b, 0600)
 }
 
 func loadData() (string, error) {
